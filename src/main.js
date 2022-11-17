@@ -17,19 +17,30 @@ function createLoadingText() {
 
 const removeLoadingText = () => document.querySelector('.loading').remove();
 
+function createErrorText(errorMessage) {
+  const span = document.createElement('span');
+  sectionProducts.appendChild(span);
+  const errorSpan = sectionProducts.lastChild;
+  errorSpan.textContent = errorMessage;
+  errorSpan.classList.add('error');
+}
+
 function createProduct(product) {
   const newElement = createProductElement(product);
   sectionProducts.appendChild(newElement);
 }
 
-async function populateSectionProducts() {
-  const products = await fetchProductsList('computador');
+async function populateSectionProducts(searchTerm) {
+  const products = await fetchProductsList(searchTerm)
+    .catch((error) => {
+      createErrorText(error.message);
+    });
   products.forEach((product) => createProduct(product));
   removeLoadingText();
 }
 
 if (sectionProducts.children.length < 1) {
   createLoadingText();
-} 
+}
 
-populateSectionProducts();
+populateSectionProducts('computador');
