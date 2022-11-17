@@ -1,6 +1,6 @@
 import { searchCep } from './helpers/cepFunctions';
 import { createProductElement } from './helpers/shopFunctions';
-import { fetchProductsList } from './helpers/fetchFunctions';
+import { fetchProduct, fetchProductsList } from './helpers/fetchFunctions';
 import './style.css';
 
 const sectionProducts = document.querySelector('section.products');
@@ -32,8 +32,8 @@ function createProduct(product) {
 
 async function populateSectionProducts(searchTerm) {
   const products = await fetchProductsList(searchTerm)
-    .catch((error) => {
-      createErrorText(error.message);
+    .catch(() => {
+      createErrorText('Algum erro ocorreu, recarregue a página e tente novamente');
     });
   products.forEach((product) => createProduct(product));
   removeLoadingText();
