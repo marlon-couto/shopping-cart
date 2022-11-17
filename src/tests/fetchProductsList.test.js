@@ -20,13 +20,12 @@ describe('Teste a função fetchProductsList', () => {
   });
 
   it('fetchProductsList retorna a estrutura de dados correta ao receber o argumento "computador"', async () => {
-    const response = await fetchProductsList('computador');
-    const data = await response.json();
+    const data = await fetchProductsList('computador');
     expect(data).toEqual(computadorSearch);
   });
 
   it('fetchProductsList retorna um erro com a mensagem "Termo de busca não informado" ao ser chamada sem argumentos', () => {
     const regex = /^Termo de busca não informado$/;
-    expect(() => fetchProductsList()).toThrow(regex);
+    expect(fetchProductsList()).rejects.toThrow(regex);
   });
 });
