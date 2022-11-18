@@ -1,15 +1,18 @@
 import { getSavedCartIDs, saveCartID } from './helpers/cartFunctions';
 import { searchCep } from './helpers/cepFunctions';
 import { fetchProduct, fetchProductsList } from './helpers/fetchFunctions';
-import { createCartProductElement, createProductElement } from './helpers/shopFunctions';
+import {
+  createCartProductElement,
+  createProductElement,
+} from './helpers/shopFunctions';
 import './style.css';
 
 document.querySelector('.cep-button').addEventListener('click', searchCep);
 
-// Seletores DOM
+// Variável global
 const sectionProducts = document.querySelector('section.products');
 
-// Mostra mensagens de aviso na página
+// Mensagens de aviso
 function createSpan() {
   const span = document.createElement('span');
   sectionProducts.appendChild(span);
@@ -33,7 +36,6 @@ function displayErrorText(errorMessage) {
   errorSpan.classList.add('error');
 }
 
-// Remove mensagem de carregamento
 const hideLoadingText = () => document.querySelector('.loading').remove();
 
 // Calcula o valor total do carrinho
@@ -41,10 +43,12 @@ async function getPrices() {
   const cartProducts = JSON.parse(localStorage.getItem('cartProducts'));
 
   if (cartProducts.length !== 0) {
-    const prices = await Promise.all(cartProducts.map(async (cartProduct) => {
-      const productPrice = (await fetchProduct(cartProduct)).price;
-      return productPrice;
-    }));
+    const prices = await Promise.all(
+      cartProducts.map(async (cartProduct) => {
+        const productPrice = (await fetchProduct(cartProduct)).price;
+        return productPrice;
+      }),
+    );
 
     const total = prices.reduce((acc, cur) => acc + cur);
 
@@ -79,7 +83,6 @@ function updateOnRemove() {
 
 async function addProductToCart(product) {
   const newProduct = createCartProductElement(product);
-
   const cartProducts = document.querySelector('.cart__products');
 
   cartProducts.appendChild(newProduct);
@@ -102,12 +105,12 @@ function createProduct(product) {
   });
 }
 
-// Popula a página com os produtos
 async function getProductsList(searchTerm) {
-  const products = await fetchProductsList(searchTerm)
-    .catch(() => {
-      displayErrorText('Algum erro ocorreu, recarregue a página e tente novamente');
-    });
+  const products = await fetchProductsList(searchTerm).catch(() => {
+    displayErrorText(
+      'Algum erro ocorreu, recarregue a página e tente novamente',
+    );
+  });
 
   return products;
 }
@@ -122,7 +125,8 @@ async function populateSectionProducts(searchTerm) {
 function restoreCart() {
   const savedProducts = getSavedCartIDs();
 
-  const promises = savedProducts.map((savedProduct) => fetchProduct(savedProduct));
+  const promises = savedProducts
+    .map((savedProduct) => fetchProduct(savedProduct));
 
   Promise.all(promises).then((values) => {
     values.forEach((value) => {
