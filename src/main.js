@@ -1,46 +1,73 @@
 import { searchCep } from './helpers/cepFunctions';
-import { createProductElement } from './helpers/shopFunctions';
+import { createCartProductElement, createProductElement } from './helpers/shopFunctions';
 import { fetchProduct, fetchProductsList } from './helpers/fetchFunctions';
+import { saveCartID } from './helpers/cartFunctions';
 import './style.css';
-
-const sectionProducts = document.querySelector('section.products');
 
 document.querySelector('.cep-button').addEventListener('click', searchCep);
 
-function createLoadingText() {
+// Seletores globais
+const sectionProducts = document.querySelector('section.products');
+
+// Mostra mensagens de aviso na página
+function displayLoadingText() {
   const span = document.createElement('span');
   sectionProducts.appendChild(span);
+
   const loadingSpan = sectionProducts.lastChild;
   loadingSpan.textContent = 'carregando...';
   loadingSpan.classList.add('loading');
 }
 
-const removeLoadingText = () => document.querySelector('.loading').remove();
+const hideLoadingText = () => document.querySelector('.loading').remove();
 
-function createErrorText(errorMessage) {
+function displayErrorText(errorMessage) {
   const span = document.createElement('span');
   sectionProducts.appendChild(span);
+
   const errorSpan = sectionProducts.lastChild;
   errorSpan.textContent = errorMessage;
   errorSpan.classList.add('error');
 }
 
+// Adiciona produtos ao carrinho de compras
+async function addProductToCart(id) {
+  const productData = await fetchProduct(id);
+  const newProduct = createCartProductElement(productData);
+  const cartProducts = document.querySelector('.cart__products');
+  cartProducts.appendChild(newProduct);
+}
+
+// Popula a página com os produtos
 function createProduct(product) {
   const newElement = createProductElement(product);
   sectionProducts.appendChild(newElement);
+
+  const buttonProductAdd = sectionProducts.lastChild.lastChild;
+
+  buttonProductAdd.addEventListener('click', async () => {
+    saveCartID(product.id);
+    addProductToCart(product.id);
+  });
+}
+
+async function getProductsList(searchTerm) {
+  const products = await fetchProductsList(searchTerm)
+    .catch(() => {
+      displayErrorText('Algum erro ocorreu, recarregue a página e tente novamente');
+    });
+  return products;
 }
 
 async function populateSectionProducts(searchTerm) {
-  const products = await fetchProductsList(searchTerm)
-    .catch(() => {
-      createErrorText('Algum erro ocorreu, recarregue a página e tente novamente');
-    });
+  const products = await getProductsList(searchTerm);
   products.forEach((product) => createProduct(product));
-  removeLoadingText();
+  hideLoadingText();
 }
 
+// Chama as funções
 if (sectionProducts.children.length < 1) {
-  createLoadingText();
+  displayLoadingText();
 }
 
 populateSectionProducts('computador');
