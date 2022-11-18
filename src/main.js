@@ -34,6 +34,7 @@ function displayErrorText(errorMessage) {
 async function addProductToCart(id) {
   const productData = await fetchProduct(id);
   const newProduct = createCartProductElement(productData);
+
   const cartProducts = document.querySelector('.cart__products');
   cartProducts.appendChild(newProduct);
 }
@@ -45,7 +46,7 @@ function createProduct(product) {
 
   const buttonProductAdd = sectionProducts.lastChild.lastChild;
 
-  buttonProductAdd.addEventListener('click', async () => {
+  buttonProductAdd.addEventListener('click', () => {
     saveCartID(product.id);
     addProductToCart(product.id);
   });
